@@ -1,0 +1,56 @@
+#!/bin/bash
+## A command line tool to manage todo list for a project
+
+## Global Variables
+CurrentFolder=$PWD
+ToDoFilePath=$CurrentFolder/.todo
+## Local functions
+# Initialize a todo list
+InitToDoList(){
+    # Test whether a .todo file has existed
+    test -f $ToDoFilePath
+    if [[ $? == 0 ]]; then
+        echo -e "\n$ToDoFilePath has existed!\nThe contest is:\n--------------------------"
+        ShowToDoList 
+        echo -e "\n--------------------------"
+        echo -e "\nDo you want to recover it? [Y/N]"    
+        read recover_state
+        if [[ $recover_state == "Y" ]]; then
+            rm -f $ToDoFilePath
+            touch $ToDoFilePath
+            echo -e "\nTodo list has been reinitialized!" 
+        elif [[ $recover_state == "N" ]]; then
+            echo -e "\nNothing has been done!"
+            return 0
+        fi
+    else
+        touch $ToDoFilePath
+        echo -e "\nTodo list file has been initialized at $ToDoFilePath" 
+    fi
+    # Add file head to todo list file
+    echo -e "\n******************\n*   TO DO LIST   *\n******************\n" > $ToDoFilePath
+}
+
+# Add a todo item to todo list file
+AddToDoItem(){
+    # local variables
+    # current time
+    local current_time=$(date "+%Y-%m-%d %H:%M:%S")
+    local todo_item_content="$1" #the first variable input the function
+    echo -e "$current_time $todo_item_content" >> $ToDoFilePath
+    echo -e "\nA todo item has been added in the todo list!"
+}
+
+# Show the current folder todo list
+ShowToDoList(){
+    cat $ToDoFilePath
+}
+
+## Program begin
+if [[ $1 == "init" ]]; then
+    InitToDoList
+elif [[ $1 == "add" ]]; then
+    AddToDoItem "$2" #" " needed for a argument with spaces
+else
+    ShowToDoList
+fi
