@@ -4,17 +4,18 @@
 ## Global Variables
 CurrentFolder=$PWD
 ToDoFilePath=$CurrentFolder/.todo
+InputArgumentsNumber=$#
+InputArguments=("$@") #get the argument array
+
 ## Local functions
 # Initialize a todo list
 InitToDoList(){
     # Test whether a .todo file has existed
     test -f $ToDoFilePath
     if [[ $? == 0 ]]; then
-        echo -e "\n$ToDoFilePath has existed!\nThe contest is:\n--------------------------"
+        echo -e "\nPath: $CurrentFolder/ has existed a TO DO LIST!\nThe contest is:"
         ShowToDoList 
-        echo -e "\n--------------------------"
-        echo -e "\nDo you want to recover it? [Y/N]"    
-        read recover_state
+        read -p "Do you want to recover it? [Y/N] " recover_state
         if [[ $recover_state == "Y" ]]; then
             rm -f $ToDoFilePath
             touch $ToDoFilePath
@@ -27,30 +28,75 @@ InitToDoList(){
         touch $ToDoFilePath
         echo -e "\nTodo list file has been initialized at $ToDoFilePath" 
     fi
-    # Add file head to todo list file
-    echo -e "\n******************\n*   TO DO LIST   *\n******************\n" > $ToDoFilePath
 }
 
 # Add a todo item to todo list file
 AddToDoItem(){
     # local variables
     # current time
-    local current_time=$(date "+%Y-%m-%d %H:%M:%S")
-    local todo_item_content="$1" #the first variable input the function
-    echo -e "$current_time $todo_item_content" >> $ToDoFilePath
-    echo -e "\nA todo item has been added in the todo list!"
+    #local current_time=$(date "+%Y-%m-%d %H:%M:%S")
+    local current_time=$(date "+%Y%m%d%H%M%S")
+    local todo_item_content=$(tr ' ' '_' <<< "$1") #the first variable input the function. And convert ' ' to '_' for storage todo_item_content
+    local todo_item_priority=${2:-0} #set default value of todo_item_priority as 0
+    # a item contains "item_state item_date item_priority item_contest"
+    # item_state 0: todo, 1: completed, 2: archived
+    # item_priority 0: lowest, 1: !, 2: !!, 3: !!!
+    echo -e "0 $current_time $todo_item_priority $todo_item_content" >> $ToDoFilePath
+    echo -e "\nA todo item has been added in the todo list!\n"
 }
 
 # Show the current folder todo list
 ShowToDoList(){
-    cat $ToDoFilePath
+    # local variables
+    # print head string
+    echo -e "\n******************\n*   TO DO LIST   *\n******************"
+    if [[ $1 == "-t" ]]; then
+        # -t sort items by date and print date
+        cat $ToDoFilePath | grep '^0' | sort -t ' ' -k 2 | awk '{$2=dconv($2);gsub("0","",$3);gsub("1","!",$3);gsub("2","!!",$3);gsub("3","!!!",$3); gsub("_"," ",$4); printf "\n%-19s %-3s %s", $2, $3, $4}
+        function dconv(x) {
+            YY=substr(x,1,4)
+            mm=substr(x,5,2)
+            dd=substr(x,7,2)
+            hh=substr(x,9,2)
+            nn=substr(x,11,2)
+            ss=substr(x,13,2)
+            return YY"/"mm"/"dd" "hh":"nn":"ss
+        }'
+    else
+        # without any argument function will show todo items sorted by priority 
+        cat $ToDoFilePath | grep '^0' | sort -t ' ' -k 3 -r | awk '{gsub("0","",$3);gsub("1","!",$3);gsub("2","!!",$3);gsub("3","!!!",$3); gsub("_"," ",$4); printf "\n%-3s%-3s %s", NR ".", $3, $4}'
+    fi
+    echo -e "\n\n******************\n"
 }
 
-## Program begin
-if [[ $1 == "init" ]]; then
-    InitToDoList
-elif [[ $1 == "add" ]]; then
-    AddToDoItem "$2" #" " needed for a argument with spaces
-else
+# Complete a todo item
+CompleteToDoItem(){
+    # show todo list by default format
     ShowToDoList
+    # ask user to input the index of the completed item
+    read -p "Please input the index of the item which you have completed (Enter to cancel!): " comp_item_index
+    if [[ -z $comp_item_index ]]; then
+        echo -e "Nothing has been done!\n"
+        exit 0
+    else
+        comp_item=$(cat $ToDoFilePath | grep '^0' | sort -t ' ' -k 3 -r | sed -n "${comp_item_index}p")
+        comp_item_line_index=$(cat $ToDoFilePath | grep -n "$comp_item" | awk '{print $1}' FS=":")
+        sed -i ".bak" "${comp_item_line_index}s/^0/1/g" $ToDoFilePath
+    fi
+}
+## Program begin
+if [[ $InputArgumentsNumber == 0 ]]; then
+    ShowToDoList
+elif [[ ${InputArguments[0]} == -* ]]; then
+    case ${InputArguments[0]} in
+        "-t" )
+            ShowToDoList -t
+            ;;
+    esac
+elif [[ ${InputArguments[0]} == "init" ]]; then
+    InitToDoList
+elif [[ ${InputArguments[0]} == "add" ]]; then
+    AddToDoItem "${InputArguments[1]}" ${InputArguments[2]}
+elif [[ ${InputArguments[0]} == "x" ]]; then
+    CompleteToDoItem
 fi
