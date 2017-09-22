@@ -81,7 +81,7 @@ CompleteToDoItem(){
     else
         comp_item=$(cat $ToDoFilePath | grep '^0' | sort -t ' ' -k 3 -r | sed -n "${comp_item_index}p")
         comp_item_line_index=$(cat $ToDoFilePath | grep -n "$comp_item" | awk '{print $1}' FS=":")
-        sed -i ".bak" "${comp_item_line_index}s/^0/1/g" $ToDoFilePath
+        sed -i ".bak" "${comp_item_line_index}s/^0/1/g" $ToDoFilePath #".bak" add for sed at OSX system
     fi
 }
 ## Program begin
