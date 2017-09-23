@@ -6,6 +6,7 @@ CurrentFolder=$PWD
 ToDoFilePath=$CurrentFolder/.todo
 InputArgumentsNumber=$#
 InputArguments=("$@") #get the argument array
+WindowCols=$(tput cols) #get the width of the current window
 
 ## Local functions
 # Initialize a todo list
@@ -48,8 +49,13 @@ AddToDoItem(){
 # Show the current folder todo list
 ShowToDoList(){
     # local variables
+    local stars=`printf %${WindowCols}s | tr " " "*"`
+    local left_space=$(($WindowCols/2-5-2)) #left space in the title
+    local right_space=$(($WindowCols-$left_space-4-10)) #right space in the title
     # print head string
-    echo -e "\n******************\n*   TO DO LIST   *\n******************"
+    echo -e "\n$stars"
+    printf "%-2s%-${left_space}s%-10s%-${right_space}s%-2s" "**" "" "TO DO LIST" "" "**"
+    echo -e "\n$stars\n"
     if [[ $1 == "-t" ]]; then
         # -t sort items by date and print date
         cat $ToDoFilePath | grep '^0' | sort -t ' ' -k 2 | awk '{$2=dconv($2);gsub("0","",$3);gsub("1","!",$3);gsub("2","!!",$3);gsub("3","!!!",$3); gsub("_"," ",$4); printf "\n%-19s %-3s %s", $2, $3, $4}
@@ -66,7 +72,7 @@ ShowToDoList(){
         # without any argument function will show todo items sorted by priority 
         cat $ToDoFilePath | grep '^0' | sort -t ' ' -k 3 -r | awk '{gsub("0","",$3);gsub("1","!",$3);gsub("2","!!",$3);gsub("3","!!!",$3); gsub("_"," ",$4); printf "\n%-3s%-3s %s", NR ".", $3, $4}'
     fi
-    echo -e "\n\n******************\n"
+    echo -e "\n\n$stars\n"
 }
 
 # Complete a todo item
