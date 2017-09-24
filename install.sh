@@ -11,11 +11,28 @@ InstallPath=/usr/local #default installation path
 if [[ $1 == --prefix=* ]]; then
     InstallPath=$(echo $1 | cut -d '=' -f 2) 
 else
-    read -p "Do you want to install todo at ${InstallPath} ? [Y/N] " install_path_default_state
-    if [[ $install_path_default_state == "N" ]]; then
-        echo -e "\nInstallation has been canceled. Please use '--prefix=install_path' flag to set the installation path."
-        exit 0
-    fi
+    case $1 in
+        --help )
+            #printf "%-7s%-12s\n" "usage: " "./install.sh"
+            echo -e "usage: ./install.sh [--help] [--prefix=<path>]"
+            echo -e "options:"
+            printf "%-9s%-16s%-s\n" "" "NONE" "Install todo at the default path:/usr/local"
+            printf "%-9s%-16s%-s\n" "" "--prefix=<path>" "Set the installation path"
+            printf "%-9s%-16s%-s\n" "" "--help" "Show help text and exit"
+            exit 0
+            ;;
+        "" )
+            read -p "Do you want to install todo at ${InstallPath} ? [Y/N] " install_path_default_state
+            if [[ $install_path_default_state == "N" ]]; then
+                echo -e "\nInstallation has been canceled. use '--prefix=install_path' option to set the installation path."
+                exit 0
+            fi
+            ;;
+        * )
+            echo -e "Unsupported option! use '--help' option to show help text"
+            exit 0
+
+    esac
 fi
 # Begin installation
 echo -e "\nInstallation begins..."
