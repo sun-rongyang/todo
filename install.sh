@@ -13,7 +13,6 @@ if [[ $1 == --prefix=* ]]; then
 else
     case $1 in
         --help )
-            #printf "%-7s%-12s\n" "usage: " "./install.sh"
             echo -e "usage: ./install.sh [--help] [--prefix=<path>]"
             echo -e "options:"
             printf "%-9s%-16s%-s\n" "" "NONE" "Install todo at the default path:/usr/local"
@@ -46,7 +45,6 @@ fi
 
 echo -e "\nCopy files to installation path..."
 cp -r $PWD/src/* $InstallPath/
-#echo -e "cp -r $PWD/src/* $InstallPath/*"
 
 echo -e "\ntodo has been installed at $InstallPath/bin/todo"
 echo -e "\nEnjoy it!"

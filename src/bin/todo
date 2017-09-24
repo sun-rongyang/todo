@@ -90,19 +90,49 @@ CompleteToDoItem(){
         sed -i ".bak" "${comp_item_line_index}s/^0/1/g" $ToDoFilePath #".bak" add for sed at OSX system
     fi
 }
+
+# Show help text
+ShowHelpText(){
+    echo -e "usage: todo [<command>] [<option>] [<args>]"
+    echo -e "command:"
+    printf "%-9s%-10s%-s\n" "" "NONE" "Show TODO list" 
+    printf "%-19s%-s\n" "" "option:"
+    printf "%-23s%-10s%-s\n" "" "NONE" "Show TODO list sorted by priority (default)"
+    printf "%-23s%-10s%-s\n" "" "-t" "Show TODO list sorted by creation time"
+    printf "%-23s%-10s%-s\n" "" "-p" "Show TODO list sorted by priority"
+    printf "%-23s%-10s%-s\n" "" "--help" "Show todo help text"
+    printf "%-9s%-10s%-s\n" "" "init" "Create a TODO list for current folder"
+    printf "%-9s%-10s%-s\n" "" "add" "'TODO item content' [priority number from 0 to 3," 
+    printf "%-9s%-10s%-s\n" "" "" "the default value is 0 which means the lowest priority]" 
+    printf "%-9s%-10s%-s\n" "" "" "Add a TODO item to TODO list"
+    printf "%-9s%-10s%-s\n" "" "x" "Complete a TODO item"
+
+}
 ## Program begin
-if [[ $InputArgumentsNumber == 0 ]]; then
-    ShowToDoList
-elif [[ ${InputArguments[0]} == -* ]]; then
-    case ${InputArguments[0]} in
-        "-t" )
-            ShowToDoList -t
-            ;;
-    esac
-elif [[ ${InputArguments[0]} == "init" ]]; then
-    InitToDoList
-elif [[ ${InputArguments[0]} == "add" ]]; then
-    AddToDoItem "${InputArguments[1]}" ${InputArguments[2]}
-elif [[ ${InputArguments[0]} == "x" ]]; then
-    CompleteToDoItem
-fi
+case ${InputArguments[0]} in
+    "" )
+        ShowToDoList
+        ;;
+    "-t")
+        ShowToDoList -t
+        ;;
+    "-p")
+        ShowHelpText
+        ;;
+    "--help")
+        ShowHelpText
+        ;;
+    "init")
+        InitToDoList
+        ;;
+    "add")
+        AddToDoItem "${InputArguments[1]}" ${InputArguments[2]}
+        ;;
+    "x")
+        CompleteToDoItem
+        ;;
+    *)
+        echo -e "Unsupported command or option!\nNothing has been done!"
+        ShowHelpText
+        exit 0
+esac
