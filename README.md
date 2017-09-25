@@ -23,13 +23,13 @@ usage: todo [<command>] [<option>] [<args>]
 command:
          NONE      Show TODO list
                    option:
-                       NONE      Show TODO list sorted by priority 									 (default)
-                       -t        Show TODO list sorted by creation 									 time
+                       NONE      Show TODO list sorted by priority (default)
+                       -t        Show TODO list sorted by creation time
                        -p        Show TODO list sorted by priority
                        --help    Show todo help text
          init      Create a TODO list for current folder
          add       'TODO item content' [priority number from 0 to 3,
-                   the default value is 0 which means the lowest 					   priority]
+                   the default value is 0 which means the lowest priority]
                    Add a TODO item to TODO list
          x         Complete a TODO item
 ```
