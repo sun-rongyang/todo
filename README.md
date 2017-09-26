@@ -12,7 +12,7 @@ You can use `todo init` to create a TODO list. A file named `.todo` will be crea
 
 ## Demo
 
-![todo demo](http://oayjon2he.bkt.clouddn.com/todo.gif)
+![todo demo](./doc/demo/todo_demo.gif)
 
 ## Usage
 
