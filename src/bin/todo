@@ -111,7 +111,13 @@ ShowHelpText(){
     printf "%-9s%-10s%-s\n" "" "" "the default value is 0 which means the lowest priority]" 
     printf "%-9s%-10s%-s\n" "" "" "Add a TODO item to TODO list"
     printf "%-9s%-10s%-s\n" "" "x" "Complete a TODO item"
+    printf "%-9s%-10s%-s\n" "" "edit" "Edit todo database file .todo by vim"
 
+}
+
+# Edit todo database file
+EditDotTodo(){
+    vim ${ToDoFilePath}
 }
 ## Program begin
 case ${InputArguments[0]} in
@@ -135,6 +141,9 @@ case ${InputArguments[0]} in
         ;;
     "x")
         CompleteToDoItem
+        ;;
+    "edit")
+        EditDotTodo
         ;;
     *)
         echo -e "Unsupported command or option!\nNothing has been done!"
